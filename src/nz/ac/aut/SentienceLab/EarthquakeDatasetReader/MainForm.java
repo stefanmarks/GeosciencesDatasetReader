@@ -19,8 +19,9 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 
 /**
- *
- * @author Stefan Marks
+ * Main class for the reader dialog.
+ * 
+ * @author Stefan Marks, SentienceLab, Auckland University of Technology
  */
 public class MainForm extends javax.swing.JFrame
 {
