@@ -125,7 +125,7 @@ public class WaveformReader
             int channels = timeSeriesCollection.size();
             Timeseries t = timeSeriesCollection.get(0);
             
-            String filename = event.getPublicId() + "_" + t.getNetworkCode() + "_" + t.getStationCode() + "_" + t.getLocation();
+            String filename = event.getPublicId().split("/")[1] + "_" + t.getNetworkCode() + "_" + t.getStationCode() + "_" + t.getLocation();
                 
             int[] offsets      = new int[channels];
             int   maxAmplitude = Integer.MIN_VALUE;
