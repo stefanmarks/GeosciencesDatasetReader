@@ -23,12 +23,12 @@ import javax.swing.SpinnerDateModel;
  * 
  * @author Stefan Marks, SentienceLab, Auckland University of Technology
  */
-public class MainForm extends javax.swing.JFrame
+public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
 {
     /**
      * Creates new form MainForm
      */
-    public MainForm()
+    public EarthquakeDatasetReaderForm()
     {
         Calendar c = Calendar.getInstance(); 
         c.getTime();
@@ -47,8 +47,7 @@ public class MainForm extends javax.swing.JFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
+    private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jFormattedTextField1 = new javax.swing.JFormattedTextField();
@@ -89,10 +88,8 @@ public class MainForm extends javax.swing.JFrame
         pnlSettings.add(lblSource, gridBagConstraints);
 
         cbxSource.setModel(new DefaultComboBoxModel(new DataSource[] { new DataSource_GeoNet(), new DataSource_USGS() }));
-        cbxSource.addItemListener(new java.awt.event.ItemListener()
-        {
-            public void itemStateChanged(java.awt.event.ItemEvent evt)
-            {
+        cbxSource.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cbxSourceItemStateChanged(evt);
             }
         });
@@ -191,10 +188,8 @@ public class MainForm extends javax.swing.JFrame
         pnlSettings.add(txtDestination, gridBagConstraints);
 
         btnDestination.setText("...");
-        btnDestination.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnDestination.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDestinationActionPerformed(evt);
             }
         });
@@ -210,10 +205,8 @@ public class MainForm extends javax.swing.JFrame
         pnlButtons.setLayout(new java.awt.GridLayout(0, 1, 0, 10));
 
         btnStart.setText("Start Download");
-        btnStart.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnStartActionPerformed(evt);
             }
         });
@@ -300,7 +293,7 @@ public class MainForm extends javax.swing.JFrame
             @Override
             public void run()
             {
-                new MainForm().setVisible(true);
+                new EarthquakeDatasetReaderForm().setVisible(true);
             }
         });
     }
