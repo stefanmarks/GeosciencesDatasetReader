@@ -272,12 +272,12 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
         if (ds instanceof DataSource_GeoNet)
         {
             txtDestination.setText("./EQ_NZ_1900_2.csv");
-            spnMagnitude.setValue(2.0);
+            spnMagnitude.setValue(2.0f);
         }
         if (ds instanceof DataSource_USGS)
         {
             txtDestination.setText("./EQ_World_1900_4.csv");
-            spnMagnitude.setValue(4.0);
+            spnMagnitude.setValue(4.0f);
         }
     }
     
@@ -351,7 +351,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                     calTo.setTime(calFrom.getTime());
                     calTo.add(Calendar.MONTH, step);
                     
-                    Double minMag = (Double) spnMagnitude.getValue();
+                    Double minMag = (double)(Float) spnMagnitude.getValue();
                     URL url = ds.constructQuery(minMag.floatValue(), calFrom.getTime(), calTo.getTime());
                     try
                     {
