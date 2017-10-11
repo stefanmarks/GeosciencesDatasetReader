@@ -62,7 +62,11 @@ public abstract class DataSource
                 if (parts.length >= maxColumn)
                 {
                     EarthquakeData data = parseData(parts);
-                    arrData.add(data);
+                    data = filter(data);
+                    if ( data != null)
+                    {
+                        arrData.add(data);
+                    }
                 }
             }
             lineCount++;
@@ -78,6 +82,9 @@ public abstract class DataSource
     }
     
     
+    public abstract EarthquakeData filter(EarthquakeData data);
+
+
     public abstract void setHeaderNames(Map<String, EarthquakeData.Item> map);
     
     

@@ -47,6 +47,13 @@ public class DataSource_USGS extends DataSource
     
     
     @Override
+    public EarthquakeData filter(EarthquakeData data)
+    {
+        return data;
+    }
+
+            
+    @Override
     public void setHeaderNames(Map<String, EarthquakeData.Item> map)
     {
         map.put("id",        EarthquakeData.Item.ID);

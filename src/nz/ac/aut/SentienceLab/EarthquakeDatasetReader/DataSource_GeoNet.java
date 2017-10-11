@@ -48,6 +48,22 @@ public class DataSource_GeoNet extends DataSource
     
     
     @Override
+    public EarthquakeData filter(EarthquakeData data)
+    {
+        // filter out data too far away from NZ
+        // e.g., on northern hemisphere
+        if ( data.latitude > 0 ) return null; 
+        // or too far W/E
+        if ( data.longitude > -170 && data.longitude < 160 ) return null;
+        
+        // convert everything into positive degrees
+        if ( data.longitude < -160 ) data.longitude += 360;
+        
+        return data;
+    }
+           
+    
+    @Override
     public void setHeaderNames(Map<String, EarthquakeData.Item> map)
     {
         map.put("publicid",   EarthquakeData.Item.ID);
