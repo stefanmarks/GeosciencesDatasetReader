@@ -221,8 +221,8 @@ public class WaveformReader
             List<String> stationNames = new ArrayList<>(stations.size());
             for (Station station : stations) 
             {
-                System.out.println(station.getCode() + " " + station.getTotalNumberChannels() + "\t" + station.getDescription());
-                stationNames.add(station.getCode());
+                System.out.println(station.getCode() + " " + station.getTotalNumberChannels() + "\t" + station.getSite().getName());
+                stationNames.add(station.getCode() + ": " + station.getSite().getName());
             }
             
             Object choice = JOptionPane.showInputDialog(null, 
@@ -233,7 +233,7 @@ public class WaveformReader
                     stationNames.toArray(), stationNames.get(0));
             if (choice instanceof String)
             {
-                r.getWaveform(event, (String) choice);
+                r.getWaveform(event, ((String) choice).split(":")[0]);
             }
         }
     }
