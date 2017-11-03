@@ -3,6 +3,7 @@ package nz.ac.aut.SentienceLab.EarthquakeDatasetReader;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
@@ -75,6 +76,28 @@ public class EarthquakeData
         return output.toString();
     }
           
+    
+    public void fromCSV(String data) throws NumberFormatException, ParseException
+    {
+        DATE_FORMAT_CSV.setTimeZone(TIMEZONE);
+        
+        String[] parts = data.split(",");
+        
+        id        = parts[0].replace("\"", "");
+        timestamp = DATE_FORMAT_CSV.parse(parts[1]);
+        longitude = round(Double.valueOf(parts[2]), 8);
+        latitude  = round(Double.valueOf(parts[3]), 8);
+        depth     = (float) round(Double.valueOf(parts[4]), 3);
+        magnitude = (float) round(Double.valueOf(parts[5]), 3);
+    }
+    
+    
+    private double round(double _value, int digits)
+    {
+        double power = Math.pow(10, digits);
+        return (Math.round(_value * power) / power);
+    }
+    
     
     public static String getCSV_Header()
     {

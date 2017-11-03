@@ -1,8 +1,10 @@
 package nz.ac.aut.SentienceLab.EarthquakeDatasetReader;
 
 import java.awt.event.ItemEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
@@ -335,7 +337,38 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                 
                 List<EarthquakeData> earthquakeList = new ArrayList<>();
                 DateFormat fmt = new SimpleDateFormat("yyyy/MM");
-                        
+                   
+                File dataFile = new File(txtDestination.getText());
+                if (dataFile.exists())
+                {
+                    try
+                    {
+                        BufferedReader br = new BufferedReader(new FileReader(dataFile));
+                        br.readLine();
+                        br.readLine();
+                        br.readLine();
+                        String line = br.readLine();
+                        while (line != null)
+                        {
+                            EarthquakeData eq = new EarthquakeData();
+                            try
+                            {
+                                eq.fromCSV(line);
+                                earthquakeList.add(eq);
+                            }
+                            catch (NumberFormatException | ParseException e)
+                            {
+                                // nothing
+                            }
+                            line = br.readLine();
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        System.err.println(e);
+                    }
+                }
+                
                 DataSource.ProgressListener progressListener = (int lineCount) ->
                 {
                     prgLoading.setString(fmt.format(calFrom.getTime()) + " / " + lineCount + " / " + earthquakeList.size());
@@ -356,7 +389,20 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                     try
                     {
                         List<EarthquakeData> list = ds.readSource(url, progressListener);
-                        earthquakeList.addAll(list);
+                        for (EarthquakeData eq : list)
+                        {
+                            int idx = earthquakeList.indexOf(eq);
+                            if (idx < 0)
+                            {
+                                // doesn't exist: add
+                                earthquakeList.add(eq);
+                            }
+                            else
+                            {
+                                // already exists: replace with newer data
+                                earthquakeList.set(idx, eq);
+                            }
+                        }                        
                         
                         if ((list.size() < ds.getMaximumItemsPerQuery() / 2) && (step < maxStep))
                         {
@@ -408,7 +454,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                         prgLoading.setIndeterminate(false);
                         prgLoading.setValue(0);
 
-                        PrintStream ps = new PrintStream(new File(txtDestination.getText()));
+                        PrintStream ps = new PrintStream(dataFile);
                         // print header + line count
                         ps.println(EarthquakeData.getCSV_Header() + "," + earthquakeList.size());
                         // print extremes
