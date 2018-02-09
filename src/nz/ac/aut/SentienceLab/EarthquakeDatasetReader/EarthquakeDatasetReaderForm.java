@@ -14,7 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JSpinner;
@@ -336,6 +338,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                 calEnd.setTime((Date) spnEnd.getValue());
                 
                 List<EarthquakeData> earthquakeList = new ArrayList<>();
+                Map<String, Integer> earthquakeIDs  = new HashMap<>();
                 DateFormat fmt = new SimpleDateFormat("yyyy/MM");
                    
                 File dataFile = new File(txtDestination.getText());
@@ -354,6 +357,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                             try
                             {
                                 eq.fromCSV(line);
+                                earthquakeIDs.put(eq.id, earthquakeList.size());
                                 earthquakeList.add(eq);
                             }
                             catch (NumberFormatException | ParseException e)
@@ -391,10 +395,11 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                         List<EarthquakeData> list = ds.readSource(url, progressListener);
                         for (EarthquakeData eq : list)
                         {
-                            int idx = earthquakeList.indexOf(eq);
-                            if (idx < 0)
+                            Integer idx = earthquakeIDs.get(eq.id);
+                            if (idx == null)
                             {
                                 // doesn't exist: add
+                                earthquakeIDs.put(eq.id, earthquakeList.size());
                                 earthquakeList.add(eq);
                             }
                             else
