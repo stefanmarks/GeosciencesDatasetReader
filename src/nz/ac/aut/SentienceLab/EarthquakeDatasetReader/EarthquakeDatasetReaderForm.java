@@ -413,7 +413,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                         {
                             step *= 2;
                         }
-                        if ( list.size() > ds.getMaximumItemsPerQuery() / 3 )
+                        if ((list.size() > ds.getMaximumItemsPerQuery() / 3) && (step >= 1))
                         {
                             step /= 2;
                         }
@@ -424,10 +424,12 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                     }
                     catch (ParseException | IOException e)
                     {
+                        System.out.println(e);
                         if ( e.getMessage().contains("HTTP") && e.getMessage().contains("400") )
                         {
                             // invalid query > reduce request range
                             step   /= 2;
+                            if (step < 1) step = 1;
                             maxStep = step;
                         }
                         else
