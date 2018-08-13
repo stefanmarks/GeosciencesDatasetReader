@@ -40,6 +40,8 @@ public abstract class DataSource
         
         URLConnection  connection = url.openConnection();
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0");
+        connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        connection.connect();
         BufferedReader in = new BufferedReader(
             new InputStreamReader(
             connection.getInputStream(), "UTF-8")
@@ -54,7 +56,10 @@ public abstract class DataSource
             {
                 // process header
                 String[] parts = inputLine.split(separator);
-                parseHeader(parts);
+                if (!parseHeader(parts))
+                {
+                    throw new ParseException("Header format mismatch (input: " + inputLine + ")", lineCount);
+                }
             }
             else
             {

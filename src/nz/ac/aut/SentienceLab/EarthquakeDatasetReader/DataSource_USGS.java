@@ -84,6 +84,6 @@ public class DataSource_USGS extends DataSource
     }
     
         
-    private static final DateFormat DATE_FORMAT_QUERY = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final DateFormat DATE_FORMAT_QUERY = new SimpleDateFormat("yyyy-MM-dd%20HH:mm:ss");
     private static final DateFormat DATE_FORMAT_PARSE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 }
