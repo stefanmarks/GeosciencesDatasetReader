@@ -18,7 +18,7 @@ import java.util.TimeZone;
  */
 public class EarthquakeData 
 {
-    public String  id;
+    public String  id, information;
     public Date    timestamp;
     public double  longitude, latitude;
     public float   depth, magnitude;
@@ -26,7 +26,7 @@ public class EarthquakeData
     
     public enum Item
     {
-        ID, TIMESTAMP, LONGITUDE, LATITUDE, DEPTH, MAGNITUDE;
+        ID, TIMESTAMP, LONGITUDE, LATITUDE, DEPTH, MAGNITUDE, INFORMATION;
     }
 
     
@@ -41,12 +41,13 @@ public class EarthquakeData
     
     public EarthquakeData(EarthquakeData copy)
     {
-        id = copy.id;
-        timestamp = (Date) copy.timestamp.clone();
-        longitude = copy.longitude;
-        latitude  = copy.latitude;
-        depth     = copy.depth;
-        magnitude = copy.magnitude;
+        id          = copy.id;
+        timestamp   = (Date) copy.timestamp.clone();
+        longitude   = copy.longitude;
+        latitude    = copy.latitude;
+        depth       = copy.depth;
+        magnitude   = copy.magnitude;
+        information = copy.information;
     }
 
 
@@ -54,8 +55,8 @@ public class EarthquakeData
     public String toString()
     {
         return String.format(
-                "EQ '%1$s': %2$td/%2$tm/%2$tY %2$tH:%2$tM, Mag %6$.1f, Pos %3$+7.2f/%4$+6.2f/%5$.1fkm", 
-                id, timestamp, longitude, latitude, depth, magnitude);
+                "EQ '%1$s': %2$td/%2$tm/%2$tY %2$tH:%2$tM, Mag %6$.1f, Pos %3$+7.2f/%4$+6.2f/%5$.1fkm, ", 
+                id, timestamp, longitude, latitude, depth, magnitude, information);
     }
     
     
@@ -72,7 +73,9 @@ public class EarthquakeData
         NUMBER_FORMAT.setMaximumFractionDigits(3);
         output
             .append(',').append(NUMBER_FORMAT.format(depth))
-            .append(',').append(NUMBER_FORMAT.format(magnitude));
+            .append(',').append(NUMBER_FORMAT.format(magnitude))
+            .append(',').append('"').append(information).append('"')
+        ;
         return output.toString();
     }
           
@@ -89,6 +92,7 @@ public class EarthquakeData
         latitude  = round(Double.valueOf(parts[3]), 8);
         depth     = (float) round(Double.valueOf(parts[4]), 3);
         magnitude = (float) round(Double.valueOf(parts[5]), 3);
+        information = (parts.length > 6) ? parts[6].replace("\"", "") : "";
     }
     
     

@@ -62,14 +62,15 @@ public class DataSource_USGS extends DataSource
         map.put("latitude",  EarthquakeData.Item.LATITUDE);
         map.put("depth",     EarthquakeData.Item.DEPTH);
         map.put("mag",       EarthquakeData.Item.MAGNITUDE);
+        map.put("place",     EarthquakeData.Item.INFORMATION);
     }
     
 
     @Override
     public EarthquakeData parseData(String[] parts) throws ParseException
     {
-        EarthquakeData data  = super.parseData(parts);
-        if ( data != null )
+        EarthquakeData data = super.parseData(parts);
+        if (data != null)
         {   
             data.timestamp = DATE_FORMAT_PARSE.parse(parts[columnMap.get(EarthquakeData.Item.TIMESTAMP)]);
         }

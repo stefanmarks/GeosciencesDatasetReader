@@ -114,7 +114,7 @@ public abstract class DataSource
         boolean success = true;
         for (EarthquakeData.Item item : EarthquakeData.Item.values())
         {
-            if ( columnMap.get(item) == null )
+            if (columnMap.get(item) == null)
             {
                 System.err.println("Could not find data column for " + item);
                 success = false;
@@ -133,6 +133,15 @@ public abstract class DataSource
         data.latitude  = Double.parseDouble(parts[columnMap.get(EarthquakeData.Item.LATITUDE)]);
         data.depth     = Float.parseFloat(parts[columnMap.get(EarthquakeData.Item.DEPTH)]);
         data.magnitude = Float.parseFloat(parts[columnMap.get(EarthquakeData.Item.MAGNITUDE)]);
+        
+        if (columnMap.containsKey(EarthquakeData.Item.INFORMATION))
+        {
+            data.information = parts[columnMap.get(EarthquakeData.Item.INFORMATION)];
+        }
+        else            
+        {
+            data.information = "";
+        }
         
         return data;
     }
