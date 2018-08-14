@@ -55,7 +55,7 @@ public class EarthquakeData
     public String toString()
     {
         return String.format(
-                "EQ '%1$s': %2$td/%2$tm/%2$tY %2$tH:%2$tM, Mag %6$.1f, Pos %3$+7.2f/%4$+6.2f/%5$.1fkm, ", 
+                "EQ '%1$s': %2$td/%2$tm/%2$tY %2$tH:%2$tM, Mag %6$.1f, Pos %3$+7.2f/%4$+6.2f/%5$.1fkm, '%7$s'", 
                 id, timestamp, longitude, latitude, depth, magnitude, information);
     }
     
@@ -105,7 +105,7 @@ public class EarthquakeData
     
     public static String getCSV_Header()
     {
-        return "id,timestamp,longitude,latitude,depth,magnitude";
+        return "id,timestamp,longitude,latitude,depth,magnitude,information";
     }
 
 

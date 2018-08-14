@@ -72,7 +72,8 @@ public class DataSource_USGS extends DataSource
         EarthquakeData data = super.parseData(parts);
         if (data != null)
         {   
-            data.timestamp = DATE_FORMAT_PARSE.parse(parts[columnMap.get(EarthquakeData.Item.TIMESTAMP)]);
+            data.timestamp   = DATE_FORMAT_PARSE.parse(parts[columnMap.get(EarthquakeData.Item.TIMESTAMP)]);
+            data.information = data.information.replace("\"", "");
         }
         return data;
     }

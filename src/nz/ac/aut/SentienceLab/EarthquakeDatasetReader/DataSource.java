@@ -112,7 +112,7 @@ public abstract class DataSource
         
         // sanity check and maximum column number check
         boolean success = true;
-        for (EarthquakeData.Item item : EarthquakeData.Item.values())
+        for (EarthquakeData.Item item : headerNames.values())
         {
             if (columnMap.get(item) == null)
             {
