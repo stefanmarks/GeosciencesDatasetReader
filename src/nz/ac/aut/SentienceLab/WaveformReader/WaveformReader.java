@@ -19,9 +19,11 @@ import edu.iris.dmc.timeseries.model.Segment;
 import edu.iris.dmc.timeseries.model.Timeseries;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,22 +57,28 @@ public class WaveformReader
         try 
         {
             List<Network> networks = stationService.fetch(stationCriteria);
-            for (Network network : networks)
+            networks.forEach((network) -> 
             {
-                for (Station station : network.getStations()) 
+                network.getStations().forEach((station) -> 
                 {
-                    Date eventDate = event.getPreferredOrigin().getTime();
-                    Date start = station.getStartDate().toGregorianCalendar().getTime();
-                    Date end   = station.getEndDate() != null ? station.getEndDate().toGregorianCalendar().getTime() : null;
-                        
-                    if ((start.compareTo(eventDate) < 0) && 
-                        (end == null || end.compareTo(eventDate) > 0) && 
-                        (station.getSelectedNumberChannels().intValue() >= 3))
+                    Calendar eventDate = new GregorianCalendar(); 
+                    eventDate.setTime(event.getPreferredOrigin().getTime());
+                    
+                    Calendar start = new GregorianCalendar();
+                    start.setTime(station.getStartDate());
+                    
+                    Calendar end = new GregorianCalendar();
+                    if (station.getEndDate() != null) end.setTime(station.getEndDate());
+                    else                              end.setTime(Date.from(Instant.now()));
+                    
+                    if ((start.compareTo(eventDate) < 0) &&
+                        (end.compareTo(eventDate) > 0) &&
+                        (station.getSelectedNumberChannels().intValue() >= 3)) 
                     {
                         stations.add(station);
                     }
-                }
-            }
+                });
+            });
         } 
         catch (NoDataFoundException | CriteriaException | ServiceNotSupportedException | IOException ex) 
         {
