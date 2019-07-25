@@ -124,15 +124,31 @@ public abstract class DataSource
     }
 
     
+    private double parse(String[] parts, EarthquakeData.Item item)
+    {
+        double value = 0;
+        int    col   = columnMap.get(item);
+        try
+        {
+            value = Double.parseDouble(parts[col]);
+        }
+        catch (NumberFormatException e)
+        {
+            System.err.println("Could not parse data in " + item + " column (\"" + parts[col] + "\")");
+        }
+        return value;
+    }
+    
+    
     public EarthquakeData parseData(String[] parts) throws ParseException
     {
         EarthquakeData data  = new EarthquakeData();
         
         data.id        = parts[columnMap.get(EarthquakeData.Item.ID)].trim();
-        data.longitude = Double.parseDouble(parts[columnMap.get(EarthquakeData.Item.LONGITUDE)]);
-        data.latitude  = Double.parseDouble(parts[columnMap.get(EarthquakeData.Item.LATITUDE)]);
-        data.depth     = Float.parseFloat(parts[columnMap.get(EarthquakeData.Item.DEPTH)]);
-        data.magnitude = Float.parseFloat(parts[columnMap.get(EarthquakeData.Item.MAGNITUDE)]);
+        data.longitude = parse(parts, EarthquakeData.Item.LONGITUDE);
+        data.latitude  = parse(parts, EarthquakeData.Item.LATITUDE);
+        data.depth     = (float) parse(parts, EarthquakeData.Item.DEPTH);
+        data.magnitude = (float) parse(parts, EarthquakeData.Item.MAGNITUDE);
         
         if (columnMap.containsKey(EarthquakeData.Item.INFORMATION))
         {
