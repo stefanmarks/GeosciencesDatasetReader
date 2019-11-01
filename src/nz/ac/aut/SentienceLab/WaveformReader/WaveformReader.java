@@ -20,6 +20,7 @@ import edu.iris.dmc.timeseries.model.Timeseries;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @author Stefan Marks (stefan.marks.ac@gmail.com)
@@ -109,6 +112,17 @@ public class WaveformReader
     }
     
     
+    private class ChannelData
+    {
+        int    idx;
+        int    sampleCount;
+        double signalSum;
+        
+        public ChannelData(int _idx) { idx = _idx; sampleCount = 0; signalSum = 0; }
+        public void   addSignal(double _s) { sampleCount++; signalSum += _s; }
+        public double getOffset() { return signalSum / sampleCount; }
+    }
+    
     public void getWaveform(Event event, String station)
     {
         Date eventDate = event.getPreferredOrigin().getTime();
@@ -130,78 +144,116 @@ public class WaveformReader
         {
             List<Timeseries> timeSeriesCollection = waveformService.fetch(waveCriteria);
 
-            int channels = timeSeriesCollection.size();
-            Timeseries t = timeSeriesCollection.get(0);
-            
-            String filename = event.getPublicId().split("/")[1] + "_" + t.getNetworkCode() + "_" + t.getStationCode() + "_" + t.getLocation();
-                
-            int[] offsets      = new int[channels];
-            int   maxAmplitude = Integer.MIN_VALUE;
-            int[] startOffsets = new int[channels];
-            int minNumSamples  = Integer.MAX_VALUE;
-            int samplerate = 0;
-            int channel = 0;
+            System.out.println("Preprocessing signals...");
+           
+            // finding earliest start timestamp
+            long startTimeMs  = 0;
             for (Timeseries timeseries : timeSeriesCollection) 
             {
                 for (Segment segment : timeseries.getSegments()) 
                 {
-                    System.out.print(
+                    System.out.println(
                         timeseries.getNetworkCode() + "\t" +
                         timeseries.getStationCode() + "\t" +
                         timeseries.getLocation() + "\t" +
-                        timeseries.getChannelCode() + "\t");
-                    System.out.print(
+                        timeseries.getChannelCode() + "\t" +
                         segment.getStartTime() + "\t" +
                         segment.getSampleCount() + "\t" +
                         segment.getSamplerate() + "\t" +
-                        segment.getType().name() + "\t");
+                        segment.getType().name());
                     
-                    samplerate = (int) segment.getSamplerate();
-                    startOffsets[channel] = (int) ((segment.getStartTime().getTime() - eventDate.getTime()) * segment.getSamplerate() / 1000.0);
-                    
-                    long average = 0;
-                    int min = Integer.MAX_VALUE;
-                    int max = Integer.MIN_VALUE;
-                    for (Integer v : segment.getIntData()) 
+                    long startTime = segment.getStartTime().getTime();
+                    if (startTimeMs == 0) 
                     {
-                        average += v;
-                        min = Math.min(min, v);
-                        max = Math.max(max, v);
+                        startTimeMs = startTime;
                     }
-                    offsets[channel] = (int) (average / segment.getSampleCount());
-                    maxAmplitude = Math.max(maxAmplitude,   max - offsets[channel]);
-                    maxAmplitude = Math.max(maxAmplitude, -(min - offsets[channel]));
-                    
-                    int numSamples = segment.getSampleCount() + startOffsets[channel];
-                    minNumSamples = Math.min(minNumSamples, numSamples);
-                    System.out.println(startOffsets[channel] + "\t" + offsets[channel] + "\t" + numSamples);
-                    
-                    channel++;
+                    if (startTime < startTimeMs)
+                    {
+                        startTimeMs = startTime;
+                    }
                 }
             }
-                
-            WavFile wavFile = WavFile.newWavFile(new File(filename + ".wav"), channels, minNumSamples, 16, samplerate * 100);
-
-            channel = 0;
-            double[][] data = new double[channels][(int) minNumSamples];
+            
+            // determining buffer size
+            int    sampleRate   = 0;
+            double maxSize      = 0;
+            int    maxSignal    = 0;
+            Map<String, ChannelData> channels = new HashMap<>();
+            
             for (Timeseries timeseries : timeSeriesCollection) 
             {
+                String channelName = timeseries.getChannelCode();
+                ChannelData channel = channels.get(channelName);
+                if (channel == null)
+                {
+                    channel = new ChannelData(channels.size());
+                    channels.put(channelName, channel);
+                }
+                
                 for (Segment segment : timeseries.getSegments()) 
                 {
-                    int idx = startOffsets[channel];
+                    if (sampleRate == 0)
+                    {
+                        sampleRate = (int) segment.getSamplerate();
+                    }
+                        
+                    long   timeOffsetMs = segment.getStartTime().getTime() - startTimeMs;
+                    double startIdx     = timeOffsetMs / 1000.0 * sampleRate;
+                    double endIdx       = startIdx + segment.getSampleCount();
+                    maxSize = Math.max(maxSize, endIdx);
+                    
                     for (Integer v : segment.getIntData()) 
                     {
-                        if ((idx >= 0) && (idx < data[channel].length))
-                        {
-                            double signal = (double)(v - offsets[channel]) / maxAmplitude;
-                            data[channel][idx] = Math.pow(Math.abs(signal), 0.75) * Math.signum(signal);
-                        }
-                        idx++;
+                        maxSignal = Math.max(maxSignal, Math.abs(v));
+                        channel.addSignal(v);
                     }
                 }
-                channel++;
             }
-            wavFile.writeFrames(data, minNumSamples);
+            long waveformBufferSize = (long) maxSize; 
+            System.out.println("Waveform buffer size: " + waveformBufferSize);
+            System.out.println("Max signal amplitude: " + maxSignal);
+            System.out.println("Channel names       : " + channels.keySet().toString());
+            System.out.println("Allocatig buffers");
+            double[][] signal = new double[channels.size()][(int) waveformBufferSize];
+            for (double[] channel : signal) {
+                for (int j = 0; j < channel.length; j++) {
+                    channel[j] = 0;
+                }
+            }
+            
+            System.out.println("Generating WAV files");
+            for (Timeseries timeseries : timeSeriesCollection) 
+            {
+                ChannelData channel = channels.get(timeseries.getChannelCode());
+                int channelIdx = channel.idx;
+                double offset = channel.getOffset();
+                
+                for (Segment segment : timeseries.getSegments()) 
+                {
+                    
+                    long timeOffsetMs = segment.getStartTime().getTime() - startTimeMs;
+                    int  startIdx     = (int) (timeOffsetMs / 1000.0 * sampleRate);
+                    
+                    for (Integer v : segment.getIntData()) 
+                    {
+                        signal[channelIdx][startIdx] = ((double) v - offset) / maxSignal;
+                        startIdx++;
+                    }
+                }
+            }
+            
+            String filename = "";
+            for (Timeseries timeseries : timeSeriesCollection) 
+            {
+                filename = event.getPublicId().split("/")[1] 
+                        + "_" + timeseries.getNetworkCode() 
+                        + "_" + timeseries.getStationCode() 
+                        + "_" + timeseries.getLocation()
+                        + ".wav";
+            }
+            
+            WavFile wavFile = WavFile.newWavFile(new File(filename), signal.length, waveformBufferSize, 16, sampleRate * 100);
+            wavFile.writeFrames(signal, (int) waveformBufferSize);
             wavFile.close();
         }
         catch (CriteriaException | NoDataFoundException | ServiceNotSupportedException | IOException | WavFileException ex)
@@ -221,7 +273,19 @@ public class WaveformReader
     {
         WaveformReader r = new WaveformReader();
         
-        Event event = r.getEvent("2016p858000");//"2016p858000");
+        String eventName = "2016p661332"; 
+        //Inangahua 1968	1550210
+        //Edgecumbe 1987	04228
+        //East Cape 1995	731516
+        //Fjordland 2003	2103645
+        //Dusky Sound 2009	3124785
+        //Darfield 2010         3366146
+        //Christchurch 2011	3468575
+        //Cook Strait 2013	2013p543824
+        //East Coast 2016	2016p661332
+        //Kaikoura 2016         2016p858000
+        
+        Event event = r.getEvent(eventName);
         if (event != null)
         {
             List<Station> stations = r.getStations(event);
