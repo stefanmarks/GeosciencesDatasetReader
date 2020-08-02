@@ -12,7 +12,11 @@ import edu.iris.dmc.service.ServiceUtil;
 import edu.iris.dmc.service.StationService;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
+import static nz.ac.aut.SentienceLab.EarthquakeDatasetReader.EarthquakeData.TIMEZONE;
 
 /**
  * @author Stefan Marks (stefan.marks.ac@gmail.com)
@@ -35,6 +39,10 @@ public class StationDatasetReader
         
         try 
         {
+            DateFormat DATE_FORMAT_CSV = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            TimeZone   TIMEZONE        = TimeZone.getTimeZone("GMT");
+            DATE_FORMAT_CSV.setTimeZone(TIMEZONE);
+            
             List<Network> networks = stationService.fetch(stationCriteria, OutputLevel.CHANNEL);
             
             s.append("Code\tDescription\tLatitude\tLongitude\tElevation\tStart\tEnd\tNumChannels\tChannels\n");
@@ -56,8 +64,8 @@ public class StationDatasetReader
                     s.append("\t").append(station.getLatitude().getValue());
                     s.append("\t").append(station.getLongitude().getValue());
                     s.append("\t").append(station.getElevation().getValue());
-                    s.append("\t").append(station.getStartDate().toString());
-                    s.append("\t").append((station.getEndDate() != null) ? station.getEndDate().toString() : "");
+                    s.append("\t").append((station.getStartDate() != null) ? DATE_FORMAT_CSV.format(station.getStartDate()) : "");
+                    s.append("\t").append((station.getEndDate()   != null) ? DATE_FORMAT_CSV.format(station.getEndDate()  ) : "");
                     s.append("\t").append(station.getTotalNumberChannels().intValue());
                     s.append("\t").append(channels);
                     s.append("\n");
