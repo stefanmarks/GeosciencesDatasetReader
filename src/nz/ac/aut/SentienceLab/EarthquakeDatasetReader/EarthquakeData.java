@@ -1,14 +1,19 @@
 package nz.ac.aut.SentienceLab.EarthquakeDatasetReader;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class for data of a single earthquake event.
@@ -22,7 +27,7 @@ public class EarthquakeData
     public Date    timestamp;
     public double  longitude, latitude;
     public float   depth, magnitude;
-    
+
     
     public enum Item
     {
@@ -78,7 +83,37 @@ public class EarthquakeData
         ;
         return output.toString();
     }
-          
+    
+    
+    public ByteBuffer toBinary()
+    {
+        BUFFER.order(ByteOrder.LITTLE_ENDIAN);
+        BUFFER.clear();
+        
+        ByteBuffer idUTF8 = STRING_CHARSET.encode(id);
+        BUFFER.put((byte) idUTF8.limit()); // not strictly correct for strings > 127 characters (C# expects 7bit variable integer encoded)
+        BUFFER.put(idUTF8);
+        
+        CALENDAR.setTime(timestamp);
+        BUFFER.putShort((short)  CALENDAR.get(Calendar.YEAR));
+        BUFFER.put(     (byte)  (CALENDAR.get(Calendar.MONTH) + 1));
+        BUFFER.put(     (byte)   CALENDAR.get(Calendar.DAY_OF_MONTH));
+        BUFFER.put(     (byte)   CALENDAR.get(Calendar.HOUR));
+        BUFFER.put(     (byte)   CALENDAR.get(Calendar.MINUTE));
+        BUFFER.put(     (byte)   CALENDAR.get(Calendar.SECOND));
+        
+        BUFFER.putFloat((float) longitude);
+        BUFFER.putFloat((float) latitude);
+        BUFFER.putFloat(depth);
+        BUFFER.putFloat(magnitude);
+
+        ByteBuffer infoUTF8 = STRING_CHARSET.encode(information);
+        BUFFER.put((byte) infoUTF8.limit());
+        BUFFER.put(infoUTF8);
+
+        return BUFFER.flip();
+    }
+    
     
     public void fromCSV(String data) throws NumberFormatException, ParseException
     {
@@ -150,4 +185,8 @@ public class EarthquakeData
     private static final DateFormat    DATE_FORMAT_CSV = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     public  static final TimeZone      TIMEZONE        = TimeZone.getTimeZone("GMT");
     private static final DecimalFormat NUMBER_FORMAT   = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
+    private static final ByteBuffer    BUFFER          = ByteBuffer.allocate(1024);
+    private static final Charset       STRING_CHARSET  = Charset.forName("UTF8");
+    private static final Calendar      CALENDAR        = Calendar.getInstance(TIMEZONE);
 }

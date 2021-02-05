@@ -4,10 +4,14 @@ import java.awt.event.ItemEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -489,6 +493,48 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                         prgLoading.setString("");
                     }
                     catch (FileNotFoundException e)
+                    {
+
+                    }
+                    
+                    try
+                    {
+                        prgLoading.setIndeterminate(false);
+                        prgLoading.setValue(0);
+
+                        dataFile = new File(txtDestination.getText().replace(".csv", ".bytes"));
+                        FileChannel out = new FileOutputStream(dataFile).getChannel();
+                        // line count
+                        ByteBuffer bb = ByteBuffer.allocate(8);
+                        bb.order(ByteOrder.LITTLE_ENDIAN);                               
+                        bb.putInt(earthquakeList.size());
+                        bb.flip();
+                        out.write(bb);
+                        // print extremes
+                        out.write(minData.toBinary());
+                        out.write(maxData.toBinary());
+
+                        int line       = 0;
+                        int oldPercent = -1;
+                        for (EarthquakeData eq : earthquakeList) 
+                        {
+                            out.write(eq.toBinary());
+                            line++;
+                            int percent = line * 100 / earthquakeList.size();
+                            if (percent != oldPercent)
+                            {
+                                oldPercent = percent;
+                                prgLoading.setString(line + "/" + earthquakeList.size() + "(" + percent + "%)");
+                                prgLoading.setValue(percent);
+                            }
+                        }
+
+                        out.close();
+                        prgLoading.setValue(0);
+                        prgLoading.setIndeterminate(true);
+                        prgLoading.setString("");
+                    }
+                    catch (IOException e)
                     {
 
                     }
