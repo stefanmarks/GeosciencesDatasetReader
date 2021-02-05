@@ -31,3 +31,4 @@ nbdist/
 # Output files
 *.wav
 *.csv
+*.bytes
