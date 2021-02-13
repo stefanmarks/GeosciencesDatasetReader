@@ -272,7 +272,7 @@ public class WaveformReader
     {
         WaveformReader r = new WaveformReader();
         
-        String eventName = "2016p661332"; 
+        String eventName = "2016p858000"; 
         //Inangahua 1968	1550210
         //Edgecumbe 1987	04228
         //East Cape 1995	731516

@@ -13,9 +13,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
-/**
+/**     
  * Class for data of a single earthquake event.
  * 
  * @author  Stefan Marks
