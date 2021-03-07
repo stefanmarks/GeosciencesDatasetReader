@@ -176,7 +176,7 @@ public class WaveformReader
             // determining buffer size
             int    sampleRate   = 0;
             double maxSize      = 0;
-            int    maxSignal    = 0;
+            double maxSignal    = 0;
             Map<String, ChannelData> channels = new HashMap<>();
             
             for (Timeseries timeseries : timeSeriesCollection) 
