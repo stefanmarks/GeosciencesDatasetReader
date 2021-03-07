@@ -97,7 +97,7 @@ public class EarthquakeData
         BUFFER.putShort((short)  CALENDAR.get(Calendar.YEAR));
         BUFFER.put(     (byte)  (CALENDAR.get(Calendar.MONTH) + 1));
         BUFFER.put(     (byte)   CALENDAR.get(Calendar.DAY_OF_MONTH));
-        BUFFER.put(     (byte)   CALENDAR.get(Calendar.HOUR));
+        BUFFER.put(     (byte)   CALENDAR.get(Calendar.HOUR_OF_DAY));
         BUFFER.put(     (byte)   CALENDAR.get(Calendar.MINUTE));
         BUFFER.put(     (byte)   CALENDAR.get(Calendar.SECOND));
         
