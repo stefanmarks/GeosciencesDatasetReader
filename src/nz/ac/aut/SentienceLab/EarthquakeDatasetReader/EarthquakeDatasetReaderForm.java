@@ -393,6 +393,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                     calTo.add(Calendar.MONTH, step);
                     
                     Double minMag = (double)(Float) spnMagnitude.getValue();
+                    calTo.add(Calendar.MONTH, 1);
                     URL url = ds.constructQuery(minMag.floatValue(), calFrom.getTime(), calTo.getTime());
                     try
                     {
