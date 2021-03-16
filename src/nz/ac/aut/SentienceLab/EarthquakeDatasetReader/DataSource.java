@@ -56,6 +56,7 @@ public abstract class DataSource
             {
                 // process header
                 String[] parts = inputLine.split(separator);
+                // System.out.println("Header: '" + inputLine + "'");
                 if (!parseHeader(parts))
                 {
                     throw new ParseException("Header format mismatch (input: " + inputLine + ")", lineCount);
@@ -157,6 +158,15 @@ public abstract class DataSource
         else            
         {
             data.information = "";
+        }
+
+        if (columnMap.containsKey(EarthquakeData.Item.TYPE))
+        {
+            data.type = parts[columnMap.get(EarthquakeData.Item.TYPE)].trim();
+        }
+        else
+        {
+            data.type = "";
         }
         
         return data;

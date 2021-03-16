@@ -22,7 +22,7 @@ import java.util.TimeZone;
  */
 public class EarthquakeData 
 {
-    public String  id, information;
+    public String  id, type, information;
     public Date    timestamp;
     public double  longitude, latitude;
     public float   depth, magnitude;
@@ -30,13 +30,15 @@ public class EarthquakeData
     
     public enum Item
     {
-        ID, TIMESTAMP, LONGITUDE, LATITUDE, DEPTH, MAGNITUDE, INFORMATION;
+        ID, TYPE, TIMESTAMP, LONGITUDE, LATITUDE, DEPTH, MAGNITUDE, INFORMATION;
     }
 
     
     public EarthquakeData()
     {
         id = "";
+        type = "";
+        information = "";
         timestamp = null;
         longitude = latitude = 0;
         magnitude = depth    = 0;
@@ -46,6 +48,7 @@ public class EarthquakeData
     public EarthquakeData(EarthquakeData copy)
     {
         id          = copy.id;
+        type        = copy.type;
         timestamp   = (Date) copy.timestamp.clone();
         longitude   = copy.longitude;
         latitude    = copy.latitude;
@@ -59,8 +62,8 @@ public class EarthquakeData
     public String toString()
     {
         return String.format(
-                "EQ '%1$s': %2$td/%2$tm/%2$tY %2$tH:%2$tM, Mag %6$.1f, Pos %3$+7.2f/%4$+6.2f/%5$.1fkm, '%7$s'", 
-                id, timestamp, longitude, latitude, depth, magnitude, information);
+                "EQ '%1$s': %2$s, %3$td/%3$tm/%3$tY %3$tH:%3$tM, Mag %7$.1f, Pos %4$+7.2f/%5$+6.2f/%6$.1fkm, '%8$s'", 
+                id, type, timestamp, longitude, latitude, depth, magnitude, information);
     }
     
     

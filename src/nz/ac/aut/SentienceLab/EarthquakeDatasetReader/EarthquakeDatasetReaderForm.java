@@ -344,8 +344,9 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                 List<EarthquakeData> earthquakeList = new ArrayList<>();
                 Map<String, Integer> earthquakeIDs  = new HashMap<>();
                 DateFormat fmt = new SimpleDateFormat("yyyy/MM");
-                   
+                  
                 File dataFile = new File(txtDestination.getText());
+                /*
                 if (dataFile.exists())
                 {
                     try
@@ -376,7 +377,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                         System.err.println(e);
                     }
                 }
-                
+                */
                 DataSource.ProgressListener progressListener = (int lineCount) ->
                 {
                     prgLoading.setString(fmt.format(calFrom.getTime()) + " / " + lineCount + " / " + earthquakeList.size());

@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 
 
@@ -36,8 +37,8 @@ public class DataSource_GeoNet extends DataSource
                 "&request=GetFeature&typeName=geonet:quake_search_v1&outputFormat=csv" + 
                 "&cql_filter=origintime>='" + DATE_FORMAT_QUERY.format(startDate) + "'" +
                 "+AND+origintime<'" + DATE_FORMAT_QUERY.format(endDate) + "'" +
-                "+AND+magnitude>=" + minMagnitude + 
-                "+AND+eventtype=earthquake");
+                "+AND+magnitude>=" + minMagnitude);// + 
+                //"+AND+eventtype=earthquake");
         }
         catch (MalformedURLException e)
         {
@@ -50,14 +51,28 @@ public class DataSource_GeoNet extends DataSource
     @Override
     public EarthquakeData filter(EarthquakeData data)
     {
+        // convert everything into positive degrees
+        if ( data.longitude < 0 ) data.longitude += 360;
+        
         // filter out data too far away from NZ
         // e.g., on northern hemisphere
         if ( data.latitude > 0 ) return null; 
         // or too far W/E
-        if ( data.longitude > -170 && data.longitude < 160 ) return null;
+        if ( data.longitude < 170-30 || data.longitude > 170+30 ) return null;
         
-        // convert everything into positive degrees
-        if ( data.longitude < -160 ) data.longitude += 360;
+        // only look for earthquakes and "earthquakes from other networks"
+        if ( !"earthquake".equals(data.type) && 
+             !"outside of network interest".equals(data.type)) 
+        {
+            /*
+            if (!DATA_TYPES.contains(data.type))
+            {
+                DATA_TYPES.add(data.type);
+                System.out.println("'"+data.type+"'");
+            }
+            */
+            return null;
+        }
         
         return data;
     }
@@ -67,6 +82,7 @@ public class DataSource_GeoNet extends DataSource
     public void setHeaderNames(Map<String, EarthquakeData.Item> map)
     {
         map.put("publicid",   EarthquakeData.Item.ID);
+        map.put("eventtype",  EarthquakeData.Item.TYPE);
         map.put("origintime", EarthquakeData.Item.TIMESTAMP);
         map.put("longitude",  EarthquakeData.Item.LONGITUDE);
         map.put("latitude",   EarthquakeData.Item.LATITUDE);
@@ -94,6 +110,7 @@ public class DataSource_GeoNet extends DataSource
     }
 
     
-    private static final DateFormat DATE_FORMAT_QUERY = new SimpleDateFormat("yyyy-MM-dd");
-    private static final DateFormat DATE_FORMAT_PARSE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    private static final DateFormat      DATE_FORMAT_QUERY = new SimpleDateFormat("yyyy-MM-dd");
+    private static final DateFormat      DATE_FORMAT_PARSE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    private static final HashSet<String> DATA_TYPES        = new HashSet<>();
 }
