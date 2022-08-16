@@ -21,7 +21,7 @@ public class DataSource_USGS extends DataSource
     @Override
     public int getMaximumItemsPerQuery()
     {
-        return 20000;
+        return 5000; // actualy 20000, but the service is wonky
     };
     
 

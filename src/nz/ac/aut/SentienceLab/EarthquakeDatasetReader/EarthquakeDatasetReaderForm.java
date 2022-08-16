@@ -386,6 +386,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                 
                 int  step    = 1;
                 int  maxStep = 1024;
+                int  retry   = 0;
                 
                 while ( execute && (calFrom.compareTo(calEnd) < 0) )
                 {
@@ -427,6 +428,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
 
                         // success > next step
                         calFrom.setTime(calTo.getTime());
+                        retry = 0;
                     }
                     catch (ParseException | IOException e)
                     {
@@ -434,7 +436,7 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                         if ( e.getMessage().contains("HTTP") && e.getMessage().contains("400") )
                         {
                             // invalid query > reduce request range
-                            step   /= 2;
+                            step /= 2;
                             if (step < 1) step = 1;
                             maxStep = step;
                         }
@@ -442,7 +444,11 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
                         {
                             // everything else: signal and terminate
                             System.err.println(e);
-                            execute = false;
+                            retry++;
+                            if (retry > 3)
+                            {
+                                execute = false;
+                            }
                         }
                     }
                 }
