@@ -1,11 +1,9 @@
 package nz.ac.aut.SentienceLab.EarthquakeDatasetReader;
 
 import java.awt.event.ItemEvent;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
@@ -296,13 +294,8 @@ public class EarthquakeDatasetReaderForm extends javax.swing.JFrame
     public static void main(String args[])
     {
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                new EarthquakeDatasetReaderForm().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new EarthquakeDatasetReaderForm().setVisible(true);
         });
     }
 

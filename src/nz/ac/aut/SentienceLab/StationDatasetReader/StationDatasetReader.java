@@ -71,9 +71,9 @@ public class StationDatasetReader
                 }
             }
         
-            FileWriter f = new FileWriter("NZ_StationList.txt");
-            f.append(s);
-            f.close();
+            try (FileWriter f = new FileWriter("NZ_StationList.txt")) {
+                f.append(s);
+            }
         } 
         catch (NoDataFoundException | CriteriaException | ServiceNotSupportedException | IOException ex) 
         {

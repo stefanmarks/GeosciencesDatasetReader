@@ -125,10 +125,10 @@ public class EarthquakeData
         
         id        = parts[0].replace("\"", "");
         timestamp = DATE_FORMAT_CSV.parse(parts[1]);
-        longitude = round(Double.valueOf(parts[2]), 8);
-        latitude  = round(Double.valueOf(parts[3]), 8);
-        depth     = (float) round(Double.valueOf(parts[4]), 3);
-        magnitude = (float) round(Double.valueOf(parts[5]), 3);
+        longitude = round(Double.parseDouble(parts[2]), 8);
+        latitude  = round(Double.parseDouble(parts[3]), 8);
+        depth     = (float) round(Double.parseDouble(parts[4]), 3);
+        magnitude = (float) round(Double.parseDouble(parts[5]), 3);
         information = (parts.length > 6) ? parts[6].replace("\"", "") : "";
     }
     
