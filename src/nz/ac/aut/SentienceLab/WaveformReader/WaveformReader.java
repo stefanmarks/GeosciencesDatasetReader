@@ -41,7 +41,7 @@ public class WaveformReader
         serviceUtil = ServiceUtil.getInstance();
         serviceUtil.setAppName("AUT SentienceLab Java Client");
         
-        String baseURL = "http://beta-service.geonet.org.nz/fdsnws/";
+        String baseURL = "http://service.geonet.org.nz/fdsnws/";
         stationService  = serviceUtil.getStationService(baseURL + "station/1/");
         eventService    = serviceUtil.getEventService(baseURL + "event/1/");
         waveformService = serviceUtil.getWaveformService(baseURL + "dataselect/1/");
@@ -97,7 +97,9 @@ public class WaveformReader
         List<Event> events = null;
         try 
         {
-            events = eventService.fetch(eventCriteria);
+            String url="https://service.geonet.org.nz/fdsnws/event/1/query?eventid="+name;
+            //events = eventService.fetch(eventCriteria);
+            events = eventService.fetch(url);
             for (Event event : events)
             {
                 System.out.println(event.getPreferredOrigin().getTime());
